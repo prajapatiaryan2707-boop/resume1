@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kwality Wall's - Share the Joy of Ice Cream!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Styles */
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .pacifico {
+            font-family: 'Pacifico', cursive;
+        }
+        .hero-section {
+            background-image: url('https://source.unsplash.com/1920x1080/?ice-cream,colorful,scoops');
+            background-size: cover;
+            background-position: center;
+        }
+        .sundae-builder-bg {
+            background-color: #FEF2F2; /* A very light red */
+            background-image:
+                radial-gradient(circle at 100% 0, #fee2e2 0, #fee2e2 15px, transparent 15px),
+                radial-gradient(circle at 0 100%, #fee2e2 0, #fee2e2 15px, transparent 15px);
+            background-size: 32px 32px;
+        }
+        .product-card, .offer-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .product-card:hover, .offer-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .sundae-option:hover, .sundae-option.selected {
+            transform: scale(1.05);
+            border-color: #f87171; /* red-400 */
+            box-shadow: 0 0 15px rgba(248, 113, 113, 0.5);
+        }
+        #sundae-visualizer {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+        #sundae-visualizer img {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+         #sundae-visualizer #bowl-img {
+            width: 100%;
+        }
+        .hidden-visual {
+            opacity: 0;
+            transform: translateX(-50%) scale(0.5);
+        }
+        .filter-btn.active {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        /* Scroll Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Mobile Menu */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-red-50">
+
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <!-- Canvas for Kwality Wall's Logo -->
+                <canvas id="kw-logo" class="h-8 mr-2" width="40" height="32"></canvas>
+                <h1 class="text-4xl text-red-500 pacifico">Kwality Wall's</h1>
+            </div>
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#products" class="text-gray-700 hover:text-red-500 transition">Products</a>
+                <a href="#sundae-builder" class="text-gray-700 hover:text-red-500 transition">Create Your Own</a>
+                <a href="#offers" class="text-gray-700 hover:text-red-500 transition">Offers</a>
+                <a href="#contact" class="text-gray-700 hover:text-red-500 transition">Contact</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 z-50">
+                <svg id="menu-open-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+                <svg id="menu-close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-white/95 backdrop-blur-sm z-40 flex flex-col items-center justify-center space-y-8 text-2xl transform -translate-x-full md:hidden">
+        <a href="#products" class="mobile-nav-link text-gray-700 hover:text-red-500 transition">Products</a>
+        <a href="#sundae-builder" class="mobile-nav-link text-gray-700 hover:text-red-500 transition">Create Your Own</a>
+        <a href="#offers" class="mobile-nav-link text-gray-700 hover:text-red-500 transition">Offers</a>
+        <a href="#contact" class="mobile-nav-link text-gray-700 hover:text-red-500 transition">Contact</a>
+    </div>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section h-[60vh] md:h-[80vh] flex items-center justify-center text-white">
+            <div class="text-center bg-black/60 p-8 rounded-xl reveal">
+                <h2 class="text-5xl md:text-7xl font-black mb-4 tracking-tight">Every Scoop a Celebration!</h2>
+                <p class="text-xl md:text-2xl mb-8 max-w-2xl">Discover a world of creamy delights and joyful moments. Your perfect treat is waiting.</p>
+                <a href="#products" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-transform transform hover:scale-105 shadow-lg">Explore Flavors</a>
+            </div>
+        </section>
+
+        <!-- Our Products Section -->
+        <section id="products" class="py-20 overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12 reveal">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Our Delicious Range</h2>
+                    <p class="text-lg text-gray-600 mt-2">From classic cones to decadent cakes, find your favorite.</p>
+                </div>
+
+                <div class="flex justify-center flex-wrap gap-4 mb-10 reveal" id="product-filters">
+                    <button class="filter-btn active py-2 px-6 bg-white rounded-full shadow-md text-gray-700 font-semibold transition" data-filter="all">All Products</button>
+                    <button class="filter-btn py-2 px-6 bg-white rounded-full shadow-md text-gray-700 font-semibold transition" data-filter="icecream">Ice Creams</button>
+                    <button class="filter-btn py-2 px-6 bg-white rounded-full shadow-md text-gray-700 font-semibold transition" data-filter="cones">Cones</button>
+                    <button class="filter-btn py-2 px-6 bg-white rounded-full shadow-md text-gray-700 font-semibold transition" data-filter="sundaes">Sundaes</button>
+                    <button class="filter-btn py-2 px-6 bg-white rounded-full shadow-md text-gray-700 font-semibold transition" data-filter="cakes">Cakes</button>
+                </div>
+
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Product items dynamically inserted here -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Special Offers Section -->
+        <section id="offers" class="py-20 bg-red-100/50 overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12 reveal">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Sweet Deals!</h2>
+                    <p class="text-lg text-gray-600 mt-2">Don't miss out on our special offers and combos.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <div class="offer-card bg-white rounded-lg shadow-lg overflow-hidden flex items-center reveal">
+                        <img src="https://placehold.co/400x300/ef4444/ffffff?text=Family+Pack" alt="Family Pack Offer" class="w-1/3 h-full object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-red-600">Family Fun Pack</h3>
+                            <p class="text-gray-600 mt-2">Buy any 2 tubs and get 1 Cornetto absolutely FREE!</p>
+                            <button class="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition">Claim Offer</button>
+                        </div>
+                    </div>
+                    <div class="offer-card bg-white rounded-lg shadow-lg overflow-hidden flex items-center reveal">
+                        <img src="https://placehold.co/400x300/b91c1c/ffffff?text=Sundae+Deal" alt="Sundae Deal" class="w-1/3 h-full object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-red-600">Sundae Funday</h3>
+                            <p class="text-gray-600 mt-2">Get 20% OFF on all Sundaes every Sunday!</p>
+                            <button class="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Create Your Own Sundae Section -->
+        <section id="sundae-builder" class="py-20 sundae-builder-bg overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12 reveal">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Unleash Your Inner Artist!</h2>
+                    <p class="text-lg text-gray-600 mt-2">Build the sundae of your dreams. It's fun, easy, and delicious!</p>
+                </div>
+                <div class="flex flex-col lg:flex-row items-center justify-center gap-10">
+                    <div class="flex-shrink-0 reveal">
+                           <div id="sundae-visualizer" class="mx-auto">
+                                <img src="https://source.unsplash.com/300x300/?white-bowl" alt="Sundae Bowl" id="bowl-img" onerror="this.onerror=null;this.src='https://placehold.co/300x300/e5e5e5/e5e5e5';">
+                                <img src="https://source.unsplash.com/150x120/?vanilla+ice+cream+scoop" alt="Vanilla Scoop" id="scoop-vanilla-img" class="hidden-visual" style="bottom: 20%;" onerror="this.onerror=null;this.src='https://placehold.co/150x120/fef3c7/fef3c7';">
+                                <img src="https://source.unsplash.com/150x120/?chocolate+ice+cream+scoop" alt="Chocolate Scoop" id="scoop-chocolate-img" class="hidden-visual" style="bottom: 30%; left: 60%;" onerror="this.onerror=null;this.src='https://placehold.co/150x120/78350f/78350f';">
+                                <img src="https://source.unsplash.com/150x120/?strawberry+ice+cream+scoop" alt="Strawberry Scoop" id="scoop-strawberry-img" class="hidden-visual" style="bottom: 20%;" onerror="this.onerror=null;this.src='https://placehold.co/150x120/fecaca/fecaca';">
+                                <img src="https://source.unsplash.com/150x120/?mint+ice+cream+scoop" alt="Mint Chip Scoop" id="scoop-mint-img" class="hidden-visual" style="bottom: 30%; left: 40%;" onerror="this.onerror=null;this.src='https://placehold.co/150x120/a7f3d0/a7f3d0';">
+                                <img src="https://source.unsplash.com/300x150/?chocolate-drizzle" alt="Chocolate Sauce" id="sauce-chocolate-img" class="hidden-visual" style="bottom: 15%;" onerror="this.onerror=null;this.src='https://placehold.co/300x150/451a03/451a03';">
+                                <img src="https://source.unsplash.com/300x150/?strawberry-drizzle" alt="Strawberry Sauce" id="sauce-strawberry-img" class="hidden-visual" style="bottom: 15%;" onerror="this.onerror=null;this.src='https://placehold.co/300x150/dc2626/dc2626';">
+                                <img src="https://source.unsplash.com/300x150/?caramel-drizzle" alt="Caramel Sauce" id="sauce-caramel-img" class="hidden-visual" style="bottom: 15%;" onerror="this.onerror=null;this.src='https://placehold.co/300x150/f59e0b/f59e0b';">
+                                <img src="https://source.unsplash.com/200x100/?candy-sprinkles" alt="Sprinkles Topping" id="topping-sprinkles-img" class="hidden-visual" style="bottom: 35%;" onerror="this.onerror=null;this.src='https://placehold.co/200x100/fca5a5/fca5a5';">
+                                <img src="https://source.unsplash.com/150x100/?chopped-nuts" alt="Nuts Topping" id="topping-nuts-img" class="hidden-visual" style="bottom: 35%;" onerror="this.onerror=null;this.src='https://placehold.co/150x100/a16207/a16207';">
+                                <img src="https://source.unsplash.com/80x80/?maraschino-cherry" alt="Cherry Topping" id="topping-cherry-img" class="hidden-visual" style="bottom: 50%;" onerror="this.onerror=null;this.src='https://placehold.co/80x80/ef4444/ef4444';">
+                            </div>
+                            <div class="text-center mt-4">
+                                <p class="text-2xl font-bold text-gray-800">Your Creation</p>
+                                <p id="sundae-price" class="text-xl text-red-600 font-semibold">₹0.00</p>
+                            </div>
+                    </div>
+                    <div class="w-full lg:w-2/3 reveal">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-700 mb-4">1. Choose Your Scoops (up to 2)</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="scoop-options">
+                                <button data-item="scoop" data-value="vanilla" data-price="150" data-target="scoop-vanilla-img" class="sundae-option bg-white p-4 rounded-lg shadow text-center cursor-pointer transition border-2 border-transparent"><span class="text-4xl">🍦</span><p class="font-semibold mt-2">Vanilla</p></button>
+                                <button data-item="scoop" data-value="chocolate" data-price="160" data-target="scoop-chocolate-img" class="sundae-option bg-white p-4 rounded-lg shadow text-center cursor-pointer transition border-2 border-transparent"><span class="text-4xl">🍫</span><p class="font-semibold mt-2">Chocolate</p></button>
+                                <button data-item="scoop" data-value="strawberry" data-price="170" data-target="scoop-strawberry-img" class="sundae-option bg-white p-4 rounded-lg shadow text-center cursor-pointer transition border-2 border-transparent"><span class="text-4xl">🍓</span><p class="font-semibold mt-2">Strawberry</p></button>
+                                <button data-item="scoop" data-value="mint" data-price="180" data-target="scoop-mint-img" class="sundae-option bg-white p-4 rounded-lg shadow text-center cursor-pointer transition border-2 border-transparent"><span class="text-4xl">🍃</span><p class="font-semibold mt-2">Mint Chip</p></button>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <h3 class="text-2xl font-bold text-gray-700 mb-4">2. Pick a Sauce</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="sauce-options">
+                                <button data-item="sauce" data-value="chocolate" data-price="50" data-target="sauce-chocolate-img" class="sundae-option bg-white p-4 rounded-lg shadow text-center cursor-pointer transition border-2 border-transparent"><span class="text-4xl">💧</span><p class="font-semibold mt-2">Chocolate Fudge</p></button>
+                                <button data-item="sauce" data-value="strawberry" data-price="50" data-target="sauce-strawberry-img" class="sundae-option bg-white p-4 rounded-lg shadow text-center cursor-pointer transition border-2 border-transparent"><span class="text-4xl">🍓</span><p class="font-semibold mt-2">Strawberry</p></button>
+                                <button data-item="sauce" data-value="caramel" data-price="60" data-target="sauce-caramel-img" class="sundae-option bg-white p-4 rounded-lg shadow text-center cursor-pointer transition border-2 border-transparent"><span class="text-4xl">🍯</span><p class="font-semibold mt-2">Caramel</p></button>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <h3 class="text-2xl font-bold text-gray-700 mb-4">3. Add a Topping</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="topping-options">
+                               <button data-item="topping" data-value="sprinkles" data-price="30" data-target="topping-sprinkles-img" class="sundae-option bg-white p-4 rounded-lg shadow text-center cursor-pointer transition border-2 border-transparent"><span class="text-4xl">✨</span><p class="font-semibold mt-2">Sprinkles</p></button>
+                               <button data-item="topping" data-value="nuts" data-price="30" data-target="topping-nuts-img" class="sundae-option bg-white p-4 rounded-lg shadow text-center cursor-pointer transition border-2 border-transparent"><span class="text-4xl">🥜</span><p class="font-semibold mt-2">Chopped Nuts</p></button>
+                               <button data-item="topping" data-value="cherry" data-price="40" data-target="topping-cherry-img" class="sundae-option bg-white p-4 rounded-lg shadow text-center cursor-pointer transition border-2 border-transparent"><span class="text-4xl">🍒</span><p class="font-semibold mt-2">Cherry on Top</p></button>
+                            </div>
+                        </div>
+                        <div class="mt-8 text-center flex justify-center items-center gap-4">
+                            <button id="reset-sundae" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-8 rounded-full text-lg transition">Reset</button>
+                             <button id="gemini-sundae" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-transform transform hover:scale-105 shadow-lg">✨ Surprise Me!</button>
+                            <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-transform transform hover:scale-105 shadow-lg">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-6 text-center">
+             <h2 class="text-3xl text-red-400 pacifico mb-4">Kwality Wall's</h2>
+             <p class="mb-6">Sharing moments of joy, one scoop at a time.</p>
+             <div class="flex justify-center space-x-6">
+                 <a href="#" class="hover:text-red-400 transition transform hover:scale-125"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.494v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.323-1.325z"/></svg></a>
+                 <a href="#" class="hover:text-red-400 transition transform hover:scale-125"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.585-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.585-.012-4.85-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.85s.012-3.584.07-4.85c.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.947s-.014-3.667-.072-4.947c-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.689-.073-4.948-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44 1.441-.645 1.441-1.44c0-.795-.645-1.44-1.441-1.44z"/></svg></a>
+                 <a href="#" class="hover:text-red-400 transition transform hover:scale-125"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616v.064c0 2.298 1.634 4.218 3.8 4.664-.715.194-1.466.26-2.24.084.622 1.942 2.427 3.352 4.566 3.39-1.623 1.277-3.666 2.038-5.89 2.038-.381 0-.757-.022-1.127-.065 2.099 1.353 4.605 2.148 7.321 2.148 8.643 0 13.576-6.837 13.29-13.064 1.013-.728 1.86-1.637 2.532-2.64z"/></svg></a>
+             </div>
+             <p class="mt-8 text-gray-400 text-sm">&copy; 2024 Kwality Wall's. All Rights Reserved.</p>
+             <p class="mt-4 text-gray-500 text-xs">Made with ❤ by MISBAH HASAN & TEAM</p>
+        </div>
+    </footer>
+
+    <!-- Gemini Modal -->
+    <div id="gemini-modal" class="fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-50 modal-overlay hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="relative bg-white rounded-lg shadow-xl modal-content transform scale-95 max-w-lg w-full p-6 text-center">
+            <h3 class="text-2xl font-bold text-gray-900 pacifico" id="modal-title">✨ Sundae Suggestion</h3>
+            <div id="modal-body" class="mt-4 text-gray-600">
+                <!-- Content will be injected here -->
+            </div>
+            <div class="mt-6">
+                <button id="close-modal" class="bg-red-500 text-white font-bold py-2 px-6 rounded-full">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Draw Kwality Wall's Logo ---
+            function drawKwLogo() {
+                const canvas = document.getElementById('kw-logo');
+                if (canvas.getContext) {
+                    const ctx = canvas.getContext('2d');
+                    const w = canvas.width;
+                    const h = canvas.height;
+
+                    // Heart shape path
+                    const path = new Path2D('M20,31.95C12,31.95,2,22.95,2,14.95C2,9.95,6,3.95,12,3.95C14.5,3.95,17.5,5.95,20,7.95C22.5,5.95,25.5,3.95,28,3.95C34,3.95,38,9.95,38,14.95C38,22.95,28,31.95,20,31.95Z');
+                    
+                    ctx.fillStyle = '#d81920'; // Red color
+                    ctx.fill(path);
+
+                    // Inner white swirls
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(20, 16, 10, 0.7, Math.PI - 0.7, false);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(20, 16, 5, 0.7, Math.PI - 0.7, false);
+                    ctx.stroke();
+                }
+            }
+
+            // --- Product Data and Filtering ---
+            const products = [
+                { id: 1, name: 'Vanilla Bean Bliss', price: '250', category: 'icecream', image: 'https://placehold.co/400x300/fef3c7/a16207?text=Vanilla' },
+                { id: 2, name: 'Death by Chocolate', price: '280', category: 'icecream', image: 'https://placehold.co/400x300/78350f/ffffff?text=Chocolate' },
+                { id: 3, name: 'Strawberry Dreams', price: '270', category: 'icecream', image: 'https://placehold.co/400x300/fecaca/9f1239?text=Strawberry' },
+                { id: 4, name: 'Classic Cornetto', price: '90', category: 'cones', image: 'https://placehold.co/400x300/fde047/a16207?text=Cornetto' },
+                { id: 5, name: 'Choco-Nut Crunch Cone', price: '120', category: 'cones', image: 'https://placehold.co/400x300/d97706/ffffff?text=Choco+Cone' },
+                { id: 6, name: 'Fruity Tutti Sundae', price: '350', category: 'sundaes', image: 'https://placehold.co/400x300/f9a8d4/86198f?text=Fruity+Sundae' },
+                { id: 7, name: 'Hot Fudge Volcano', price: '400', category: 'sundaes', image: 'https://placehold.co/400x300/451a03/ffffff?text=Hot+Fudge' },
+                { id: 8, name: 'Black Forest Ice Cream Cake', price: '950', category: 'cakes', image: 'https://placehold.co/400x300/3730a3/ffffff?text=Ice+Cream+Cake' },
+                { id: 9, name: 'Pistachio Power', price: '300', category: 'icecream', image: 'https://placehold.co/400x300/a7f3d0/047857?text=Pistachio' },
+                { id: 10, name: 'Rainbow Delight Cake', price: '1100', category: 'cakes', image: 'https://placehold.co/400x300/a5b4fc/4338ca?text=Rainbow+Cake' }
+            ];
+
+            const productGrid = document.getElementById('product-grid');
+            const filterContainer = document.getElementById('product-filters');
+
+            function displayProducts(filter = 'all') {
+                productGrid.innerHTML = '';
+                const filteredProducts = products.filter(p => filter === 'all' || p.category === filter);
+
+                filteredProducts.forEach((product, index) => {
+                    const productCard = `
+                        <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col reveal" style="transition-delay: ${index * 100}ms" data-category="${product.category}">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+                            <div class="p-6 flex-grow flex flex-col">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">${product.name}</h3>
+                                <div class="flex-grow"></div>
+                                <div class="flex justify-between items-center mt-4">
+                                    <span class="text-2xl font-black text-red-500">₹${product.price}</span>
+                                    <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition shadow-md">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    productGrid.innerHTML += productCard;
+                });
+                // After adding new cards, re-observe them for animations
+                observeElements();
+            }
+
+            filterContainer.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    document.querySelector('.filter-btn.active').classList.remove('active');
+                    e.target.classList.add('active');
+                    displayProducts(e.target.dataset.filter);
+                }
+            });
+
+            // --- Mobile Menu ---
+            const mobileMenuBtn = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const openIcon = document.getElementById('menu-open-icon');
+            const closeIcon = document.getElementById('menu-close-icon');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('-translate-x-full');
+                openIcon.classList.toggle('hidden');
+                closeIcon.classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('-translate-x-full');
+                    openIcon.classList.remove('hidden');
+                    closeIcon.classList.add('hidden');
+                });
+            });
+
+            // --- Sundae Builder Logic ---
+            const sundaeState = { scoops: [], sauce: null, topping: null };
+
+            function setupSundaeBuilder() {
+                const optionContainers = ['scoop-options', 'sauce-options', 'topping-options'];
+                optionContainers.forEach(id => document.getElementById(id).addEventListener('click', handleOptionClick));
+                document.getElementById('reset-sundae').addEventListener('click', resetSundae);
+                 document.getElementById('gemini-sundae').addEventListener('click', getSundaeSuggestion);
+            }
+
+            function handleOptionClick(e) {
+                const button = e.target.closest('button.sundae-option');
+                if (!button) return;
+
+                const { item, value, price, target } = button.dataset;
+                const selection = { value, price: parseFloat(price), target, element: button };
+
+                switch (item) {
+                    case 'scoop':
+                        const existingIndex = sundaeState.scoops.findIndex(s => s.value === value);
+                        if (existingIndex > -1) {
+                            sundaeState.scoops.splice(existingIndex, 1);
+                            button.classList.remove('selected');
+                        } else if (sundaeState.scoops.length < 2) {
+                            sundaeState.scoops.push(selection);
+                            button.classList.add('selected');
+                        }
+                        break;
+                    case 'sauce':
+                    case 'topping':
+                        const current = sundaeState[item];
+                        if (current && current.value === value) {
+                            current.element.classList.remove('selected');
+                            sundaeState[item] = null;
+                        } else {
+                            if (current) current.element.classList.remove('selected');
+                            sundaeState[item] = selection;
+                            button.classList.add('selected');
+                        }
+                        break;
+                }
+                updateSundaeVisualAndPrice();
+            }
+
+            function updateSundaeVisualAndPrice() {
+                document.querySelectorAll('#sundae-visualizer img:not(#bowl-img)').forEach(img => img.classList.add('hidden-visual'));
+
+                let total = 0;
+                sundaeState.scoops.forEach(s => {
+                    document.getElementById(s.target)?.classList.remove('hidden-visual');
+                    total += s.price;
+                });
+                if (sundaeState.sauce) {
+                    document.getElementById(sundaeState.sauce.target)?.classList.remove('hidden-visual');
+                    total += sundaeState.sauce.price;
+                }
+                if (sundaeState.topping) {
+                    document.getElementById(sundaeState.topping.target)?.classList.remove('hidden-visual');
+                    total += sundaeState.topping.price;
+                }
+
+                document.getElementById('sundae-price').textContent = `₹${total.toFixed(2)}`;
+            }
+
+            function resetSundae() {
+                document.querySelectorAll('.sundae-option.selected').forEach(el => el.classList.remove('selected'));
+                sundaeState.scoops = [];
+                sundaeState.sauce = null;
+                sundaeState.topping = null;
+                updateSundaeVisualAndPrice();
+            }
+
+            // --- Gemini API Integration ---
+            const modal = document.getElementById('gemini-modal');
+            const modalBody = document.getElementById('modal-body');
+            const closeModalBtn = document.getElementById('close-modal');
+
+            function showModal(content) {
+                modalBody.innerHTML = content;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function hideModal() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+            closeModalBtn.addEventListener('click', hideModal);
+
+            async function getSundaeSuggestion() {
+                showModal('<p>Creating a delicious surprise...</p><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mt-4"></div>');
+
+                const apiKey = ""; // API key will be injected in production
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const systemPrompt = "You are a creative ice cream connoisseur. Your task is to invent a fun and delicious-sounding sundae combination. The user's shop has the following options: Scoops: Vanilla, Chocolate, Strawberry, Mint Chip. Sauces: Chocolate Fudge, Strawberry, Caramel. Toppings: Sprinkles, Chopped Nuts, Cherry on Top. You must suggest a sundae with one or two scoops, one sauce, and one topping. Give it a creative name. Then list the ingredients.";
+
+                const payload = {
+                    contents: [{ parts: [{ text: "Suggest a sundae." }] }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                       throw new Error(`API Error: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (text) {
+                        showModal(`<div class="prose text-left">${text.replace(/\n/g, '<br>')}</div>`);
+                    } else {
+                        showModal("<p>Sorry, I couldn't come up with a suggestion right now. Please try again!</p>");
+                    }
+                } catch (error) {
+                    console.error('Gemini API call failed:', error);
+                    showModal("<p>Something went wrong while asking for a suggestion. Please check the console and try again later.</p>");
+                }
+            }
+
+
+            // --- Scroll Animation Observer ---
+            let observer;
+            function observeElements() {
+                const elementsToReveal = document.querySelectorAll('.reveal');
+                if (observer) observer.disconnect();
+
+                observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                elementsToReveal.forEach(el => observer.observe(el));
+            }
+            
+            // --- Initializations ---
+            drawKwLogo();
+            displayProducts();
+            setupSundaeBuilder();
+            observeElements();
+        });
+    </script>
+</body>
+</html>
